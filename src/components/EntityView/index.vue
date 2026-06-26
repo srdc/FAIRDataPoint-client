@@ -103,56 +103,62 @@
           </a>
         </p>
 
-        <entity-metadata :metadata="metadata" />
-
-        <div class="mt-4">
-          <a
-            class="btn btn-outline-primary btn-rounded mr-2"
-            :href="`${subject}?format=ttl`"
-            target="_blank"
-          ><fa :icon="['fas', 'download']" /> ttl</a>
-          <a
-            class="btn btn-outline-primary btn-rounded mr-2"
-            :href="`${subject}?format=rdf`"
-            target="_blank"
-          ><fa :icon="['fas', 'download']" /> rdf+xml</a>
-          <a
-            class="btn btn-outline-primary btn-rounded mr-2"
-            :href="`${subject}?format=jsonld`"
-            target="_blank"
-          ><fa :icon="['fas', 'download']" /> json-ld</a>
-        </div>
-
-        <ul
-          v-if="itemLists && itemLists.length > 1"
-          class="nav nav-tabs item-list-nav"
-        >
-          <li
-            v-for="(itemList, index) in itemLists"
-            :key="`item-menu-${index}`"
-            class="nav-item"
-          >
-            <a
-              class="nav-link"
-              :class="{'active': activeItemList == itemList}"
-              @click.prevent="setActiveItemList(itemList)"
+        <div class="row">
+          <div class="col-12 metadata-column"
+               :class="{'col-xl-5': !!itemLists && itemLists.length > 0}">
+            <entity-metadata :metadata="metadata" />
+            <div class="mt-4">
+              <a
+                class="btn btn-outline-primary btn-rounded mr-2"
+                :href="`${subject}?format=ttl`"
+                target="_blank"
+              ><fa :icon="['fas', 'download']" /> ttl</a>
+              <a
+                class="btn btn-outline-primary btn-rounded mr-2"
+                :href="`${subject}?format=rdf`"
+                target="_blank"
+              ><fa :icon="['fas', 'download']" /> rdf+xml</a>
+              <a
+                class="btn btn-outline-primary btn-rounded mr-2"
+                :href="`${subject}?format=jsonld`"
+                target="_blank"
+              ><fa :icon="['fas', 'download']" /> json-ld</a>
+            </div>
+          </div>
+          <div class="col-12 col-xl-7">
+            <ul
+              v-if="itemLists && itemLists.length > 1"
+              class="nav nav-tabs item-list-nav"
             >
-              {{ itemList.title }}
-            </a>
-          </li>
-        </ul>
-        <item-list
-          v-if="activeItemList"
-          :key="activeItemList.childUrlPrefix"
-          :config="config"
-          :child-spec="activeItemList.childSpec"
-          :meta="meta"
-          :child-url-prefix="activeItemList.childUrlPrefix"
-          :entity-id="entityId"
-          :title="activeItemList.title"
-          :create-link="activeItemList.createLink"
-          data-cy="item-list"
-        />
+              <li
+                v-for="(itemList, index) in itemLists"
+                :key="`item-menu-${index}`"
+                class="nav-item"
+              >
+                <a
+                  class="nav-link"
+                  :class="{'active': activeItemList == itemList}"
+                  @click.prevent="setActiveItemList(itemList)"
+                >
+                  {{ itemList.title }}
+                </a>
+              </li>
+            </ul>
+            <item-list
+              v-if="activeItemList"
+              :key="activeItemList.childUrlPrefix"
+              :config="config"
+              :child-spec="activeItemList.childSpec"
+              :meta="meta"
+              :child-url-prefix="activeItemList.childUrlPrefix"
+              :entity-id="entityId"
+              :title="activeItemList.title"
+              :create-link="activeItemList.createLink"
+              :import-link="activeItemList.importLink"
+              data-cy="item-list"
+            />
+          </div>
+        </div>
       </template>
     </page>
   </div>

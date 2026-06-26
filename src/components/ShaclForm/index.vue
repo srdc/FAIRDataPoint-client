@@ -2,6 +2,7 @@
   <div>
     <status-flash :status="status" />
     <form
+      id="shacl--form"
       v-if="!status.isError() && formDefinition"
       @submit.prevent="onSubmit"
     >

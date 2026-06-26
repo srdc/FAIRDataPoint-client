@@ -85,14 +85,13 @@ function createQuads(
     .filter((tc) => originalRdf.statementsMatching(data.subject, RDF('type'), tc).length === 0)
     .map((tc) => $rdf.quad(data.subject, RDF('type'), tc, null))
 
-  const findField = (key) => shape.fields.find((field) => field.path === key)
+  const findField = (key) => shape?.fields.find((field) => field.path === key)
 
   const quads = Object.entries(data.data).flatMap(([key, values]) => {
     if (_.isArray(values)) {
       return values.flatMap((value) => {
         if (isFormData(value)) {
-          const nestedQuads = createQuads(value, originalRdf, shape)
-
+          const nestedQuads = createQuads(value, originalRdf, findField(key)?.nodeShape)
           if (nestedQuads.length > 0) {
             return [
               $rdf.quad(data.subject, $rdf.namedNode(key), _.get(value, 'subject'), null),

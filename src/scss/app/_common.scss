@@ -12,12 +12,14 @@ h1 {
   @include typography-default-32-bold;
   margin-top: $space-md;
   margin-bottom: $space-md;
+  color: $color-primary;
 }
 
 h2 {
   @include typography-default-24-bold;
   margin-top: $space-lg;
   margin-bottom: $space-md;
+  color: $color-primary;
 }
 
 h3 {

@@ -10,7 +10,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: $space-lg;
+    //margin-top: $space-lg;
     margin-bottom: $space-sm;
 
     h2 {
@@ -19,7 +19,7 @@
   }
 
   &__empty {
-    color: $color-text-light;
+    color: $color-text-lighter;
   }
 
   .nav-tabs + & {

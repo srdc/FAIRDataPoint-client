@@ -591,9 +591,9 @@ export default class SearchResults extends Vue {
       this.sparqlTemplate = query.data.template
       this.savedQueries = savedQueries.data
 
-      const [prefixes, rest1] = this.sparqlTemplate.split('{{prefixes}}\n')
-      const [selectStart, rest2] = rest1.split('{{graphPattern}}\n')
-      const [selectEnd, afterOrdering] = rest2.split('{{ordering}}\n')
+      const [prefixes, rest1] = this.sparqlTemplate?.split('{{prefixes}}\n') || []
+      const [selectStart, rest2] = rest1?.split('{{graphPattern}}\n') || []
+      const [selectEnd, afterOrdering] = rest2?.split('{{ordering}}\n') || []
 
       this.sparqlParts = {
         prefixes,

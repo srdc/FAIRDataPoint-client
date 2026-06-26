@@ -4,9 +4,9 @@
 
 
 .entity-metadata {
-  margin-top: $space-lg;
-  border-top: $border-width-line solid $color-separator;
-  border-bottom: $border-width-line solid $color-separator;
+  //margin-top: $space-lg;
+  //border-top: $border-width-line solid $color-separator;
+  //border-bottom: $border-width-line solid $color-separator;
 
   h2 {
     margin-top: 0;
@@ -14,7 +14,7 @@
 
   .entity-metadata__group {
     border-bottom: $border-width-line solid $color-separator;
-    padding: $space-lg 0;
+    padding: $space-sm 0;
 
     &:last-child {
       border-bottom: none;
@@ -104,4 +104,8 @@
   .entity-metadata__group__title + .entity-metadata__item {
     padding-top: 0;
   }
+}
+
+.entity-metadata .entity-metadata__group .entity-metadata__item {
+  flex-wrap: wrap;
 }

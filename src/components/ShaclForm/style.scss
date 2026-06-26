@@ -1,12 +1,20 @@
 @import "../../scss/variables";
 
+#shacl--form {
+  border: 1px solid #DCDCDC;
+  background: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
 .form-renderer {
   .shacl-group {
     margin-top: 2rem;
     padding-bottom: 1rem;
 
     & > .form__group {
-      border-left: 4px solid $color-separator;
+      border-left: 4px solid $color-complementary;
       padding: 0.5rem 0 2.25rem 1rem;
       margin-bottom: 0;
 
@@ -16,8 +24,36 @@
     }
   }
 
+  .tabs {
+    margin-top: -1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+
+    background: $color-primary;
+
+    .tab {
+      min-width: 5rem;
+      padding: 1rem;
+      color: white;
+      text-decoration: none;
+
+      &.active {
+        background: darken($color-primary, 10);
+      }
+
+      &:not(.active):hover {
+        background: lighten($color-primary, 10);
+      }
+
+    }
+
+  }
+
   .form-renderer {
-    border-left: 4px solid $color-separator;
+    border-left: 4px solid $color-complementary;
     padding: 0.5rem 0 0.5rem 1rem;
     width: 100%;
     margin-bottom: 1rem;

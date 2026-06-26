@@ -5,7 +5,7 @@
 .breadcrumbs {
   @include typography-default-14;
   width: 100%;
-  background: $color-background-highlighted;
+  background: $color-complementary;
   height: $breadcrumbs-height;
 
   @media (max-width: $breakpoint-small - 1px) {

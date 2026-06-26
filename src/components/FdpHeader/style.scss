@@ -5,6 +5,7 @@
 .header {
   width: 100%;
   height: $header-height;
+  background: $header-background-color;
 
   &__container {
     max-width: $container-max-width;
@@ -25,9 +26,10 @@
     background: url($header-logo-url) left center no-repeat;
     background-size: $header-logo-width $header-logo-height;
     text-decoration: none;
+    color: $color-light;
 
     &:hover {
-      color: $color-primary;
+      color: $color-text-light;
       text-decoration: none;
     }
 
@@ -59,6 +61,9 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    .search-field a {
+      color: $color-light !important;
+    }
   }
 
   &__menu {
@@ -83,6 +88,10 @@
         text-decoration: none !important;
         display: flex;
         align-items: center;
+
+        &:after {
+          color: $color-light;
+        }
 
         &:hover {
           text-decoration: none !important;

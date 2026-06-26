@@ -4,15 +4,26 @@
       <h2>
         {{ title }}
       </h2>
-      <router-link
-        v-if="createLink"
-        class="btn btn-link"
-        :to="createLink"
-        data-cy="create"
-      >
-        <fa :icon="['fas', 'plus']" />
-        Create
-      </router-link>
+      <div>
+        <router-link
+          v-if="createLink"
+          class="btn btn-link"
+          :to="createLink"
+          data-cy="create"
+        >
+          <fa :icon="['fas', 'plus']" />
+          Create
+        </router-link>
+        <router-link
+          v-if="importLink"
+          class="btn btn-link"
+          :to="importLink"
+          data-cy="import"
+        >
+          <fa :icon="['fas', 'download']" />
+          Import
+        </router-link>
+      </div>
     </div>
     <div
       v-if="status.isError()"
@@ -78,6 +89,9 @@ export default class ItemList extends Vue {
 
   @Prop({ type: String, required: false, default: null })
   readonly createLink: string
+
+  @Prop({ type: String, required: false, default: null })
+  readonly importLink: string
 
   status: Status = new Status()
 

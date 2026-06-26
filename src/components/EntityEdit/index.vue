@@ -10,7 +10,6 @@
       v-if="simpleGraph !== null"
       :title="`Edit ${entity.title}`"
       content-only
-      small
     >
       <template #content>
         <status-flash :status="submitStatus">

@@ -20,6 +20,7 @@ import IndexSettings from '@/views/IndexSettings/index.vue'
 import IndexPing from '@/views/IndexPing/index.vue'
 import FdpSettings from '@/views/FdpSettings/index.vue'
 import Profile from '@/views/Profile/index.vue'
+import EntityImportPage from '@/views/EntityImportPage/index.vue'
 import Users from '../views/Users/index.vue'
 import UserDetail from '../views/UserDetail/index.vue'
 import UserCreate from '../views/UserCreate/index.vue'
@@ -65,6 +66,8 @@ export function createRouter(store) {
     { path: '/:entity/:id/settings', component: EntitySettingsPage, meta: { requiresAuth: true } },
     { path: '/create-:entity', component: EntityCreatePage, meta: { requiresAuth: true } },
     { path: '/:parentEntity/:id/create-:entity', component: EntityCreatePage, meta: { requiresAuth: true } },
+    { path: '/import-:entity', component: EntityImportPage, meta: { requiresAuth: true } },
+    { path: '/:parentEntity/:id/import-:entity', component: EntityImportPage, meta: { requiresAuth: true } },
     { path: '/search', component: SearchResults },
     { path: '/not-allowed', component: NotAllowed },
     { path: '*', component: NotFound },

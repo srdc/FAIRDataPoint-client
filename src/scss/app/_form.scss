@@ -72,12 +72,12 @@
       width: 100%;
       box-sizing: border-box;
       border: none;
-      border-bottom: 2px solid $color-text-light;
+      border-bottom: 2px solid $color-complementary;
       outline: none;
 
       &:disabled {
         cursor: not-allowed;
-        color: $color-text-lighter;
+        color: $color-text-default;
         border-bottom-color: $color-separator;
       }
     }
@@ -93,7 +93,7 @@
     }
 
     input::placeholder, textarea::placeholder {
-      color: $color-text-light;
+      color: $color-text-lighter;
     }
 
     textarea {

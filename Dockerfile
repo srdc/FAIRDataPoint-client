@@ -10,10 +10,11 @@ RUN npm install
 
 # build-layer
 COPY . .
-RUN npm run build
+#RUN npm run build
 
 # update version info
 RUN apk add git
+RUN ls -la /app && ls -la /app/scripts && sed -i 's/\r$//' /app/scripts/build_info.sh && sh /app/scripts/build_info.sh
 RUN scripts/build_info.sh
 
 ###### DISTRIBUTION STAGE ######
@@ -37,5 +38,5 @@ COPY nginx/start.sh /start.sh
 
 # app files (static)
 COPY --from=build-stage /app/dist /usr/share/nginx/html
-
+RUN sed -i 's/\r$//' /start.sh && chmod +x /start.sh
 CMD ["/start.sh"]

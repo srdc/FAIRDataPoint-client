@@ -132,6 +132,10 @@ export class EntityConfig {
     return `/${this.spec.urlPrefix}/${entityId}/create-${this.getChildUrlPrefix(child)}`
   }
 
+  public importChildUrl(child: ChildSpec, entityId: string) {
+    return `/${this.spec.urlPrefix}/${entityId}/import-${this.getChildUrlPrefix(child)}`
+  }
+
   public createChildrenLists(canCreateChild = false, entityId = null) : any[] {
     return this.spec.children.map((child) => this.createChildrenListSpec(
       child,
@@ -152,6 +156,7 @@ export class EntityConfig {
       childUrlPrefix: childSpec.urlPrefix,
       childSpec: child,
       createLink: canCreateChild ? this.createChildUrl(child, entityId) : null,
+      importLink: canCreateChild ? this.importChildUrl(child, entityId) : null,
     }
   }
 

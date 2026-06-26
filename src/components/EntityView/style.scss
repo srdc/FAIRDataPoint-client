@@ -1,0 +1,8 @@
+@import "../../scss/variables";
+
+.metadata-column {
+  border: 1px solid $color-separator;
+  background: $color-light;
+  padding: $space-md;
+  border-radius: $space-md;
+}

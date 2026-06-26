@@ -30,6 +30,7 @@ function field(label, input, extra = {}) {
   return {
     label,
     value: input.label,
+    items: input.items,
     uri: input.uri,
     ...extra,
   }
@@ -69,7 +70,42 @@ function commonMetadata(graph: Graph) {
   return metadataGroups
 }
 
-function wrapShaclValue(fieldConfig, value) {
+function asSubjectNode(value: any): any | null {
+  if (!value) {
+    return null
+  }
+
+  // Already an rdflib term
+  if (value.termType === 'NamedNode' || value.termType === 'BlankNode') {
+    return value
+  }
+
+  // Raw string IRI / blank node id
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return null
+
+    // Any "_..." string we treat as a blank node id
+    if (trimmed.startsWith('_')) {
+      // rdflib blankNode takes an id without the "_:" prefix, but it's fine
+      // to pass the whole thing too; to be safe we strip "_:" if present
+      return $rdf.blankNode(trimmed.replace(/^_:/, ''))
+    }
+
+    // Everything else is assumed to be an absolute IRI
+    return $rdf.namedNode(trimmed)
+  }
+
+  // Sometimes rdflib terms are wrapped and the actual string
+  // is in .value – handle that as a fallback
+  if (typeof value.value === 'string') {
+    return asSubjectNode(value.value)
+  }
+
+  return null
+}
+
+function wrapShaclValue(fieldConfig, value, graph) {
   if (!value) {
     return null
   }
@@ -79,6 +115,17 @@ function wrapShaclValue(fieldConfig, value) {
       return itemFromPath(value)
     case DASH('URIViewer').value:
       return { label: value, uri: value }
+    case DASH('DetailsViewer').value:
+      try {
+        return {
+          label: value,
+          items: fieldConfig.nodeShape?.fields
+            ?.map((ch) => fromShaclField(graph, ch, asSubjectNode(value)))
+            .filter((f) => f !== null),
+        }
+      } catch (err) {
+        return null
+      }
     default:
       if (fieldUtils.isDatetime(fieldConfig)) {
         return { label: moment(value).format(config.dateFormat) }
@@ -91,25 +138,26 @@ function wrapShaclValue(fieldConfig, value) {
   }
 }
 
-function getShaclValue(graph: Graph, fieldConfig) {
+function getShaclValue(graph: Graph, fieldConfig, subject = null) {
+  const options = subject ? { subject } : {}
+
   if (fieldConfig.maxCount === 1) {
-    const value = graph.findOne($rdf.namedNode(fieldConfig.path))
-    return wrapShaclValue(fieldConfig, value)
+    const value = graph.findOne($rdf.namedNode(fieldConfig.path), options)
+    return wrapShaclValue(fieldConfig, value, graph)
   }
 
-  const values = graph.findAll($rdf.namedNode(fieldConfig.path))
-  return values.map((v) => wrapShaclValue(fieldConfig, v)).filter((v) => v !== null)
+  const values = graph.findAll($rdf.namedNode(fieldConfig.path), options)
+  return values.map((v) => wrapShaclValue(fieldConfig, v, graph)).filter((v) => v !== null)
 }
 
-function fromShaclField(graph: Graph, fieldConfig) {
+function fromShaclField(graph: Graph, fieldConfig, subject?) {
   const name = fieldUtils.getName(fieldConfig)
-  const value = getShaclValue(graph, fieldConfig)
-
+  const value = getShaclValue(graph, fieldConfig, subject)
   if (!value || _.isEmpty(value)) {
     return null
   }
 
-  return field(name, getShaclValue(graph, fieldConfig))
+  return field(name, value)
 }
 
 export default {

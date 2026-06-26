@@ -4,18 +4,29 @@
     class="form form-renderer"
   >
     <div
-      v-for="group in definition.groups"
-      :key="`${group.iri}`"
-      :class="{'shacl-group' : !!group.label }"
+      v-if="definition.groups.length > 1"
+      class="tabs"
     >
-      <h2 v-if="group.label">
+      <a
+        v-for="group in definition.groups"
+        :key="group.iri"
+        :class="{ 'tab': true, 'active': group === activeGroup }"
+        @click="selectedGroup = group"
+      >
         {{ group.label }}
+      </a>
+    </div>
+    <div
+      :class="{'shacl-group' : !!activeGroup.label }"
+    >
+      <h2 v-if="activeGroup.label">
+        {{ activeGroup.label }}
       </h2>
-      <p v-if="group.comment">
-        {{ group.comment }}
+      <p v-if="activeGroup.comment">
+        {{ activeGroup.comment }}
       </p>
       <div
-        v-for="field in group.fields"
+        v-for="field in activeGroup.fields"
         :key="`${field.path}`"
         :class="{'form__group': true, 'form__group--error': getError(field)}"
       >
@@ -83,12 +94,15 @@
 </template>
 <script lang="ts">
 import * as $rdf from 'rdflib'
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import {
+  Component, Prop, Vue, Watch,
+} from 'vue-property-decorator'
 import _ from 'lodash'
 import FormInput from '@/components/ShaclForm/FormInput.vue'
 import fieldUtils from '@/components/ShaclForm/fieldUtils'
 import { ValidationReport } from '@/components/ShaclForm/Parser/ValidationReport'
 import { SHACL } from '@/rdf/namespaces'
+import { Group } from '@/components/ShaclForm/Parser/SHACLParser'
 
 @Component({
   name: 'FormRenderer',
@@ -112,6 +126,23 @@ export default class FormRenderer extends Vue {
   componentKey: number = 0
 
   dirtyFields: Set<string>
+
+  selectedGroup: Group<any> = null
+
+  get activeGroup(): Group<any> {
+    return this.selectedGroup || this.definition.groups[0]
+  }
+
+  @Watch('validationReport')
+  onValidationReportChange() {
+    if (!this.activeGroup.fields.some((field: any) => this.getError(field))) {
+      const errorGroup = this.definition
+        .groups.find((g) => g.fields.some((f) => this.getError(f)))
+      if (errorGroup) {
+        this.selectedGroup = errorGroup
+      }
+    }
+  }
 
   wrapNodeShape(nodeShape) {
     return {

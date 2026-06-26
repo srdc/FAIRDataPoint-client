@@ -5,15 +5,15 @@
       :key="groupIndex"
       class="entity-metadata__group"
     >
-      <div
-        v-if="group.label"
-        class="entity-metadata__group__title"
-      >
-        <h2>{{ group.label }}</h2>
-        <p v-if="group.comment">
-          {{ group.comment }}
-        </p>
-      </div>
+<!--      <div-->
+<!--        v-if="group.label"-->
+<!--        class="entity-metadata__group__title"-->
+<!--      >-->
+<!--        <h2>{{ group.label }}</h2>-->
+<!--        <p v-if="group.comment">-->
+<!--          {{ group.comment }}-->
+<!--        </p>-->
+<!--      </div>-->
 
       <div
         v-for="(data, dataIndex) in group.fields"
@@ -39,8 +39,13 @@
                 v-for="(item, itemIndex) in viewItems(`${groupIndex}-${dataIndex}`, data.items)"
                 :key="itemIndex"
               >
+                <template v-if="item.items">
+                  <entity-metadata
+                    :metadata="[{fields: item.items}]"
+                  />
+                </template>
                 <rdf-link
-                  v-if="item.uri"
+                  v-else-if="item.uri"
                   :uri="item.uri"
                   :label="item.label"
                   :label-resolved="item.labelResolved"
@@ -89,7 +94,10 @@ import _ from 'lodash'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import RdfLink from '@/components/RdfLink/index.vue'
 
-@Component({ components: { RdfLink } })
+@Component({
+  name: 'EntityMetadata',
+  components: { RdfLink },
+})
 export default class EntityMetadata extends Vue {
   @Prop({ type: Array, default: [] })
   readonly metadata: Array<any>

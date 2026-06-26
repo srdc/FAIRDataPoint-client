@@ -29,6 +29,10 @@ export class RepositoryConfig extends EntityConfig {
     return `/create-${this.getChildUrlPrefix(child)}`
   }
 
+  public importChildUrl(child: ChildSpec, _entityId): string {
+    return `/import-${this.getChildUrlPrefix(child)}`
+  }
+
   public createBreadcrumbs(_graph: Graph, _entityId) {
     return []
   }
