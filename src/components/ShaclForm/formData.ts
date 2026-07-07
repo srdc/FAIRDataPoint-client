@@ -128,6 +128,11 @@ function createQuads(
           wrappedValue = $rdf.Literal.fromValue(value)
           // Override auto-detected datatype
           wrappedValue.datatype = $rdf.namedNode(field.datatype)
+          // fromValue() renders a JS Date as a full dateTime
+          const isXsdDate = field.datatype === 'http://www.w3.org/2001/XMLSchema#date'
+          if (value instanceof Date && isXsdDate) {
+            wrappedValue.value = value.toISOString().slice(0, 10)
+          }
         }
 
         return hasValue

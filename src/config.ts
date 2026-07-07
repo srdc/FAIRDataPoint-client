@@ -8,6 +8,8 @@ const appTitleShort = () => _.get(window, 'config.appTitle', 'FDP')
 const appSubtitle = () => _.get(window, 'config.appSubtitle', 'Metadata for machines')
 const isIndex = () => _.get(window, 'config.index', false)
 const persistentURL = () => _.get(window, 'config.persistentURL', apiURL)
+// Base URL of the stage-fdp-extractor service
+const extractorURL = _.get(window, 'config.extractorURL', '/excel-extraction')
 const dateFormat = 'DD-MM-Y'
 const dateTimeFormat = 'DD-MM-Y, HH:mm:ss'
 const defaultPageSize = 5
@@ -21,6 +23,7 @@ export default {
   dateFormat,
   dateTimeFormat,
   defaultPageSize,
+  extractorURL,
   isIndex,
   persistentURL,
   publicPath,
