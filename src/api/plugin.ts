@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import config from '@/config'
 import request from './request'
 
@@ -16,8 +17,9 @@ const createRequestInterceptor = (store) => {
 
 const createResponseInterceptor = (store) => {
   request.interceptors.response.use(null, async (error) => {
-    const { status } = error.response
-    if (status === 401 && !error.request.responseURL.endsWith('/tokens')) {
+    const status = _.get(error, 'response.status')
+    const responseURL = _.get(error, 'request.responseURL', '')
+    if (status === 401 && !responseURL.endsWith('/tokens')) {
       await store.dispatch('auth/logout')
       window.location.href = `${config.publicPath}/login`
     } else {
