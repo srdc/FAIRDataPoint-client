@@ -50,3 +50,11 @@ $ npm run lint
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for more details.
+
+## Acknowledgements
+
+This repository is a fork of FairDataPoint-client and includes extensions and adaptations developed for the [STAGE project](https://stage-healthyageing.eu/), .
+
+STAGE has received funding from the European Union’s Horizon Europe Research and Innovation Programme under grant agreement nº 101137146. UK participants in Horizon Europe Project STAGE are supported by UKRI grant numbers 10112787 (Beta Technology), 10099041 (University of Bristol) and 10109957 (Imperial College London).
+
+For more information about the project, visit the [STAGE project website](https://stage-healthyageing.eu/).
