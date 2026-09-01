@@ -136,12 +136,18 @@ export class EntityConfig {
     return `/${this.spec.urlPrefix}/${entityId}/import-${this.getChildUrlPrefix(child)}`
   }
 
+  private static readonly INLINE_CHILD_RELATIONS = [
+    'http://healthdataportal.eu/ns/health#hasVariables',
+  ]
+
   public createChildrenLists(canCreateChild = false, entityId = null) : any[] {
-    return this.spec.children.map((child) => this.createChildrenListSpec(
-      child,
-      canCreateChild,
-      entityId,
-    ))
+    return this.spec.children
+      .filter((child) => !EntityConfig.INLINE_CHILD_RELATIONS.includes(child.relationUri))
+      .map((child) => this.createChildrenListSpec(
+        child,
+        canCreateChild,
+        entityId,
+      ))
   }
 
   private createChildrenListSpec(
