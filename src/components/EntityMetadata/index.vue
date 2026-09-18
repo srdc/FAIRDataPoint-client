@@ -54,8 +54,44 @@
                 <template v-else>
                   {{ item.label }}
                 </template>
+                <a
+                  v-if="data.inlineChild && item.uri"
+                  class="inline-child-remove"
+                  title="Remove"
+                  data-cy="remove-inline-child"
+                  @click.prevent="emitRemoveInlineChild(data, item)"
+                >
+                  <fa :icon="['far', 'trash-alt']" />
+                </a>
               </li>
             </ul>
+            <div
+              v-if="data.inlineChild"
+              class="inline-child-actions"
+            >
+              <span
+                v-if="data.items.length === 0"
+                class="inline-child-actions__empty"
+              >
+                {{ data.inlineChild.emptyText }}
+              </span>
+              <router-link
+                class="inline-child-actions__link"
+                :to="data.inlineChild.createLink"
+                data-cy="create-inline-child"
+              >
+                <fa :icon="['fas', 'plus']" />
+                Create
+              </router-link>
+              <router-link
+                class="inline-child-actions__link"
+                :to="data.inlineChild.importLink"
+                data-cy="import-inline-child"
+              >
+                <fa :icon="['fas', 'download']" />
+                Import
+              </router-link>
+            </div>
             <a
               v-if="showMoreActive(`${groupIndex}-${dataIndex}`, data.items)"
               class="show-more-link"
@@ -120,6 +156,17 @@ export default class EntityMetadata extends Vue {
   readonly nested: boolean
 
   viewAll = []
+
+  /**
+   * Bubbled up to EntityView, which owns the child API and reloads the page afterwards.
+   */
+  emitRemoveInlineChild(data, item): void {
+    this.$emit('remove-inline-child', {
+      urlPrefix: data.inlineChild.childUrlPrefix,
+      uri: item.uri,
+      label: item.label,
+    })
+  }
 
   get filteredMetadata() {
     if (!this.metadata) return []

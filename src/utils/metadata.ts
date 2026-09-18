@@ -115,17 +115,24 @@ function wrapShaclValue(fieldConfig, value, graph) {
       return itemFromPath(value)
     case DASH('URIViewer').value:
       return { label: value, uri: value }
-    case DASH('DetailsViewer').value:
-      try {
-        return {
-          label: value,
-          items: fieldConfig.nodeShape?.fields
-            ?.map((ch) => fromShaclField(graph, ch, asSubjectNode(value)))
-            .filter((f) => f !== null),
-        }
-      } catch (err) {
-        return null
+    case DASH('DetailsViewer').value: {
+      const subjectNode = asSubjectNode(value)
+      if (!subjectNode) return null
+
+      const items = (fieldConfig.nodeShape?.fields ?? [])
+        .map((ch) => fromShaclField(graph, ch, subjectNode))
+        .filter((f) => f !== null)
+
+      const isNamed = subjectNode.termType === 'NamedNode'
+
+      if (items.length === 0) {
+        return isNamed ? itemFromPath(subjectNode.value) : null
       }
+
+      return isNamed
+        ? { label: rdfUtils.pathTerm(subjectNode.value), uri: subjectNode.value, items }
+        : { items }
+    }
     default:
       if (fieldUtils.isDatetime(fieldConfig)) {
         return { label: moment(value).format(config.dateFormat) }
@@ -139,7 +146,15 @@ function wrapShaclValue(fieldConfig, value, graph) {
 }
 
 function getShaclValue(graph: Graph, fieldConfig, subject = null) {
-  const options = subject ? { subject } : {}
+  const options: any = subject ? { subject } : {}
+
+  // A nested shape needs the object as an rdflib term, not as a string. Graph.find defaults to
+  // returning `object.value`, and a blank node's identifier does not survive that round trip -
+  // the `_:` prefix lives on toString(), not on .value - so stringifying loses the subject and
+  // every child lookup then misses. Graph.find already supports asking for the term itself.
+  if (fieldConfig.viewer === DASH('DetailsViewer').value) {
+    options.value = false
+  }
 
   if (fieldConfig.maxCount === 1) {
     const value = graph.findOne($rdf.namedNode(fieldConfig.path), options)

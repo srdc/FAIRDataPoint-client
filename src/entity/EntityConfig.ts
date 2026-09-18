@@ -140,6 +140,13 @@ export class EntityConfig {
     'http://healthdataportal.eu/ns/health#hasVariables',
   ]
 
+  public inlineChildSpec(relationUri: string): ChildSpec | null {
+    if (!EntityConfig.INLINE_CHILD_RELATIONS.includes(relationUri)) {
+      return null
+    }
+    return this.spec.children.find((child) => child.relationUri === relationUri) || null
+  }
+
   public createChildrenLists(canCreateChild = false, entityId = null) : any[] {
     return this.spec.children
       .filter((child) => !EntityConfig.INLINE_CHILD_RELATIONS.includes(child.relationUri))

@@ -93,6 +93,28 @@
       }
     }
 
+    .inline-child-remove {
+      @include typography-primary-14;
+      margin-left: $space-sm;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .inline-child-actions {
+      margin-top: $space-sm;
+
+      .inline-child-actions__empty {
+        @include typography-lighter-16-semibold;
+        margin-right: $space-sm;
+      }
+
+      .inline-child-actions__link {
+        @include typography-primary-14;
+        margin-right: $space-md;
+        text-decoration: none;
+      }
+    }
+
     .show-more-link {
       @include typography-primary-14;
       margin-top: $space-md;
