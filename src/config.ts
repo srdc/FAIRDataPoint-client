@@ -13,6 +13,8 @@ const extractorURL = _.get(window, 'config.extractorURL', '/excel-extraction')
 const dateFormat = 'DD-MM-Y'
 const dateTimeFormat = 'DD-MM-Y, HH:mm:ss'
 const defaultPageSize = 5
+const contentPageSizes = [10, 25, 50, 100]
+const defaultContentPageSize = 25
 
 export default {
   apiURL,
@@ -21,7 +23,9 @@ export default {
   appTitleShort,
   clientURL,
   dateFormat,
+  contentPageSizes,
   dateTimeFormat,
+  defaultContentPageSize,
   defaultPageSize,
   extractorURL,
   isIndex,

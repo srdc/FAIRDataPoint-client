@@ -108,6 +108,7 @@
                :class="{'col-xl-5': !!itemLists && itemLists.length > 0}">
             <entity-metadata
               :metadata="metadata"
+              :no-truncate="config.hasPagedContent"
               @remove-inline-child="removeInlineChild"
             />
             <div class="mt-4">
@@ -162,6 +163,55 @@
             />
           </div>
         </div>
+
+        <div
+          v-if="config.hasPagedContent && graph"
+          class="csvw-content"
+          data-cy="content-pager"
+        >
+          <csvw-table
+            :graph="graph"
+            :subject="subject"
+            :sort="contentSort"
+            :order="contentOrder"
+            :loading="contentLoading"
+            @sort="setContentSort"
+          >
+            <template #toolbar>
+              <div
+                v-if="contentTotal > 0"
+                class="content-pager__info"
+              >
+                <span>
+                  Variables {{ contentFrom }}&ndash;{{ contentTo }} of {{ contentTotal }}
+                </span>
+                <label class="content-pager__size">
+                  Per page
+                  <select
+                    :value="contentPageSize"
+                    class="form-control form-control-sm"
+                    :disabled="contentLoading"
+                    @change="setContentPageSize(parseInt($event.target.value, 10))"
+                  >
+                    <option
+                      v-for="pageSize in contentPageSizes"
+                      :key="pageSize"
+                      :value="pageSize"
+                    >
+                      {{ pageSize }}
+                    </option>
+                  </select>
+                </label>
+              </div>
+            </template>
+          </csvw-table>
+          <pagination
+            v-if="contentTotal > 0"
+            :last-page="contentLastPage"
+            :current-page="contentPage"
+            @pageSelected="loadContentPage"
+          />
+        </div>
       </template>
     </page>
   </div>
@@ -170,13 +220,16 @@
 import { Component } from 'vue-property-decorator'
 import axios from 'axios'
 import _ from 'lodash'
+import parseLinkHeader from 'parse-link-header'
 import Graph from '@/rdf/Graph'
 import { DCT } from '@/rdf/namespaces'
 import Breadcrumbs from '@/components/Breadcrumbs/index.vue'
+import CsvwTable from '@/components/CsvwTable/index.vue'
 import EntityMetadata from '@/components/EntityMetadata/index.vue'
 import ItemList from '@/components/ItemList/index.vue'
 import MembershipBadge from '@/components/MembershipBadge/index.vue'
 import Page from '@/components/Page/index.vue'
+import Pagination from '@/components/Pagination/index.vue'
 import StatusFlash from '@/components/StatusFlash/index.vue'
 import metadata from '@/utils/metadata'
 import permissions from '@/utils/permissions'
@@ -186,15 +239,20 @@ import { parseSHACLView } from '@/components/ShaclForm/Parser/SHACLViewParser'
 import EntityBase from '@/components/EntityBase'
 import FairDataPoints from '@/components/FairDataPoints/index.vue'
 import config from '@/config'
+import { SortKey, SortOrder } from '@/utils/csvw'
+
+const CSVW_TABLE = 'http://www.w3.org/ns/csvw#table'
 
 @Component({
   components: {
     FairDataPoints,
     Breadcrumbs,
+    CsvwTable,
     EntityMetadata,
     ItemList,
     MembershipBadge,
     Page,
+    Pagination,
     StatusFlash,
   },
 })
@@ -214,6 +272,34 @@ export default class EntityView extends EntityBase {
   groups: any = null
 
   viewIndex: any = null
+
+  contentPage = 0
+
+  contentPageSize = config.defaultContentPageSize
+
+  contentTotal: number = null
+
+  contentLastPage = 0
+
+  contentSort: SortKey = 'name'
+
+  contentOrder: SortOrder = 'asc'
+
+  contentLoading = false
+
+  requestSeq = 0
+
+  get contentPageSizes() {
+    return config.contentPageSizes
+  }
+
+  get contentFrom() {
+    return this.contentPage * this.contentPageSize + 1
+  }
+
+  get contentTo() {
+    return Math.min((this.contentPage + 1) * this.contentPageSize, this.contentTotal)
+  }
 
   get permissions() {
     return permissions
@@ -266,16 +352,27 @@ export default class EntityView extends EntityBase {
     this.extraLinks = []
     this.createLink = null
     this.groups = null
+    this.contentPage = 0
+    this.contentTotal = null
+    this.contentLastPage = 0
+    this.contentLoading = false
+    this.contentSort = 'name'
+    this.contentOrder = 'asc'
   }
 
   async fetchData(): Promise<void> {
+    this.requestSeq += 1
+    const seq = this.requestSeq
     try {
       this.viewIndex = this.isIndex && this.isRepository
 
       this.status.setPending()
       const [entity, spec, meta] = await this.loadData()
+      if (seq !== this.requestSeq) return
 
+      this.contentLoading = false
       this.buildGraph(entity.data)
+      this.setContentPaging(entity)
       this.groups = parseSHACLView(spec.data, this.config.targetClasses)
 
       this.meta = meta.data
@@ -293,16 +390,86 @@ export default class EntityView extends EntityBase {
       // After setDone so the page renders immediately; the titles arrive a moment later.
       this.resolveInlineChildTitles()
     } catch (error) {
+      if (seq !== this.requestSeq) return
       this.status.setErrorFromResponse(error, 'Unable to get data.')
     }
   }
 
   async loadData() {
     return axios.all([
-      this.config.api.get(this.entityId),
+      this.loadEntity(),
       this.config.api.getSpec(),
       this.config.api.getMeta(this.entityId),
     ])
+  }
+
+  loadEntity() {
+    return this.config.hasPagedContent
+      ? this.config.api.getContentPage(
+        this.entityId,
+        this.contentPage,
+        this.contentPageSize,
+        this.contentSort,
+        this.contentOrder,
+      )
+      : this.config.api.get(this.entityId)
+  }
+
+  setContentPaging(response) {
+    if (!this.config.hasPagedContent) return
+
+    const total = parseInt(_.get(response.headers, 'x-total-count'), 10)
+    const links = parseLinkHeader(_.get(response.headers, 'link'))
+    const lastPage = parseInt(_.get(links, 'last.page'), 10)
+    this.contentTotal = Number.isNaN(total) ? null : total
+    this.contentLastPage = Number.isNaN(lastPage) ? 0 : lastPage
+  }
+
+  async loadContentPage(
+    page: number,
+    size: number = this.contentPageSize,
+    sort: SortKey = this.contentSort,
+    order: SortOrder = this.contentOrder,
+  ): Promise<void> {
+    const previousPage = this.contentPage
+    const previousSize = this.contentPageSize
+    const previousSort = this.contentSort
+    const previousOrder = this.contentOrder
+    this.requestSeq += 1
+    const seq = this.requestSeq
+    try {
+      this.contentLoading = true
+      this.contentPage = page
+      this.contentPageSize = size
+      this.contentSort = sort
+      this.contentOrder = order
+      const entity = await this.loadEntity()
+      if (seq !== this.requestSeq) return
+      this.buildGraph(entity.data)
+      this.setContentPaging(entity)
+      this.metadata = this.createMetadata()
+      this.status.setDone()
+    } catch (error) {
+      if (seq !== this.requestSeq) return
+      this.contentPage = previousPage
+      this.contentPageSize = previousSize
+      this.contentSort = previousSort
+      this.contentOrder = previousOrder
+      this.status.setErrorFromResponse(error, 'Unable to get data.')
+    } finally {
+      if (seq === this.requestSeq) {
+        this.contentLoading = false
+      }
+    }
+  }
+
+  setContentPageSize(size: number): void {
+    this.loadContentPage(0, size)
+  }
+
+  setContentSort(key: SortKey): void {
+    const order = key === this.contentSort && this.contentOrder === 'asc' ? 'desc' : 'asc'
+    this.loadContentPage(0, this.contentPageSize, key, order)
   }
 
   createMetadata() {
@@ -316,6 +483,8 @@ export default class EntityView extends EntityBase {
     return this.groups
       .map((group) => ({
         fields: group.fields
+          // A CSVW Table Group's variables are shown in their own table below
+          .filter((fieldConfig) => !this.config.hasPagedContent || fieldConfig.path !== CSVW_TABLE)
           .map((fieldConfig) => this.withInlineChildActions(
             fieldConfig,
             metadata.fromShaclField(this.graph, fieldConfig),
@@ -347,30 +516,32 @@ export default class EntityView extends EntityBase {
    * Replaces the bare id shown for an inline child with its dct:title
    */
   async resolveInlineChildTitles(): Promise<void> {
-    const prefixes = _.uniq(
-      (this.metadata || [])
-        .flatMap((group) => group.fields || [])
-        .filter((field) => field && field.inlineChild && !_.isEmpty(field.items))
-        .map((field) => field.inlineChild.childUrlPrefix),
-    )
-    if (prefixes.length === 0) return
+    const inlineChildren: { uri: string, urlPrefix: string }[] = (this.metadata || [])
+      .flatMap((group) => group.fields || [])
+      .filter((field) => field && field.inlineChild && !_.isEmpty(field.items))
+      .flatMap((field) => field.items
+        .filter((item) => item.uri)
+        .map((item) => ({ uri: item.uri, urlPrefix: field.inlineChild.childUrlPrefix })))
+    const children = _.uniqBy(inlineChildren, 'uri')
+    if (children.length === 0) return
 
+    const metadataSnapshot = this.metadata
     const titles = new Map<string, string>()
 
-    await Promise.all(prefixes.map(async (prefix) => {
+    await Promise.all(children.map(async ({ uri, urlPrefix }) => {
       try {
-        const { data } = await this.config.api.getChildren(this.entityId, prefix, 0)
-        const graph = new Graph(data, this.config.subject(this.entityId))
-
-        graph.store.match(null, DCT('title'), null).forEach((statement) => {
-          titles.set(_.get(statement, 'subject.value'), _.get(statement, 'object.value'))
-        })
+        const childConfig = this.$store.getters['entities/config'](urlPrefix)
+        const { data } = await childConfig.api.getContentPage(rdfUtils.pathTerm(uri), 0, 1)
+        const title = new Graph(data, uri).findOne(DCT('title'))
+        if (title) {
+          titles.set(uri, `${title}`)
+        }
       } catch {
-        // The endpoint is unavailable or the child is not listed, so the id stands.
+        // The endpoint is unavailable or the child is not accessible, so the id stands.
       }
     }))
 
-    if (titles.size === 0) return
+    if (titles.size === 0 || this.metadata !== metadataSnapshot) return
 
     this.metadata = this.metadata.map((group) => ({
       ...group,

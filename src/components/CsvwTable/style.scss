@@ -1,0 +1,132 @@
+@import "../../scss/variables";
+@import "../../scss/mixins";
+@import "../../scss/typography";
+
+.csvw-table {
+  @include transition-default(opacity);
+
+  &.csvw-table--loading {
+    opacity: .5;
+  }
+
+  .csvw-table__section:not(:first-child) {
+    margin-top: $space-lg;
+  }
+
+  .csvw-table__heading {
+    margin-bottom: $space-md;
+
+    h2 {
+      @include typography-primary-18-bold;
+      margin: 0;
+    }
+
+    .csvw-table__url {
+      @include typography-primary-14;
+      word-break: break-all;
+    }
+
+    .csvw-table__keywords {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      margin: $space-xs 0 0;
+      padding: 0;
+
+      li {
+        @include typography-default-14;
+        background: $color-background-highlighted;
+        border-radius: 10rem;
+        margin: $space-xs $space-xs 0 0;
+        padding: 0 $space-sm;
+      }
+    }
+  }
+
+  .csvw-table__scroll {
+    border: 1px solid $color-separator;
+    border-radius: $space-md;
+    background: $color-light;
+    overflow-x: auto;
+  }
+
+  .csvw-table__grid {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: $space-sm $space-md;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid $color-separator;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: $color-background;
+    }
+
+    th {
+      white-space: nowrap;
+      background: $color-background;
+    }
+
+    td {
+      @include typography-default-14;
+      word-break: break-word;
+    }
+  }
+
+  .csvw-table__sort {
+    @include typography-lighter-16-semibold;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:hover,
+    &.csvw-table__sort--active {
+      color: $color-primary;
+    }
+
+    &:disabled {
+      cursor: wait;
+    }
+
+    .csvw-table__sort-icon {
+      font-size: .75em;
+      margin-left: $space-xs;
+    }
+  }
+
+  .csvw-table__col--name {
+    @include typography-default-14-semibold;
+    white-space: nowrap;
+  }
+
+  td.csvw-table__col--name {
+    color: $color-text-dark;
+  }
+
+  .csvw-table__col--description {
+    min-width: 18rem;
+  }
+
+  .csvw-table__col--datatype {
+    white-space: nowrap;
+  }
+
+  td.csvw-table__col--propertyUrl a {
+    color: $color-primary;
+    white-space: nowrap;
+  }
+
+  .csvw-table__empty {
+    @include typography-lighter-16-semibold;
+    text-align: center;
+  }
+}

@@ -6,3 +6,30 @@
   padding: $space-md;
   border-radius: $space-md;
 }
+
+.csvw-content {
+  margin-top: $space-lg;
+
+  > nav {
+    margin-top: $space-md;
+  }
+
+  .content-pager__info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-sm;
+  }
+
+  .content-pager__size {
+    display: flex;
+    align-items: center;
+    margin: 0;
+
+    select {
+      width: auto;
+      margin-left: $space-sm;
+    }
+  }
+}

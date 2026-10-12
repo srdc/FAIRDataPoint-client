@@ -34,15 +34,20 @@
             </a>
           </template>
           <template v-else-if="data.items">
-            <ul>
+            <ul :class="{'entity-metadata__list--single': isSingleValue(data)}">
               <li
                 v-for="(item, itemIndex) in viewItems(`${groupIndex}-${dataIndex}`, data.items)"
                 :key="itemIndex"
               >
+                <span
+                  v-if="item.sublabel"
+                  class="entity-metadata__sublabel"
+                >{{ item.sublabel }}</span>
                 <template v-if="item.items">
                   <entity-metadata
                     :metadata="[{fields: item.items}]"
                     :nested="true"
+                    :no-truncate="noTruncate"
                   />
                 </template>
                 <rdf-link
@@ -155,7 +160,16 @@ export default class EntityMetadata extends Vue {
   @Prop({ type: Boolean, default: false })
   readonly nested: boolean
 
+  @Prop({ type: Boolean, default: false })
+  readonly noTruncate: boolean
+
   viewAll = []
+
+  readonly bulletSingleValues = false
+
+  isSingleValue(data): boolean {
+    return !this.bulletSingleValues && !data.inlineChild && data.items.length === 1
+  }
 
   /**
    * Bubbled up to EntityView, which owns the child API and reloads the page afterwards.
@@ -181,11 +195,11 @@ export default class EntityMetadata extends Vue {
   }
 
   showMoreActive(key, items) {
-    return items.length > 4 && !this.getViewAll(key)
+    return !this.noTruncate && items.length > 4 && !this.getViewAll(key)
   }
 
   showLessActive(key, items) {
-    return items.length > 4 && this.getViewAll(key)
+    return !this.noTruncate && items.length > 4 && this.getViewAll(key)
   }
 
   getViewAll(key) {

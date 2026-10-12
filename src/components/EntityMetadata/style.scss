@@ -45,11 +45,21 @@
       h3 {
         flex: 0 0 15rem;
       }
+
+      > p {
+        flex: 1 1 0;
+        min-width: 0;
+      }
     }
 
     ul {
       margin: 0;
       padding-left: 1.25rem;
+
+      &.entity-metadata__list--single {
+        list-style: none;
+        padding-left: 0;
+      }
 
       li {
         @include typography-dark-18-semibold;
@@ -58,7 +68,16 @@
         &:not(:first-child) {
           margin-top: $space-sm;
         }
+
+        a {
+          vertical-align: top;
+        }
       }
+    }
+
+    .entity-metadata__sublabel {
+      @include typography-lighter-16-semibold;
+      margin-right: $space-xs * 2;
     }
 
     h3 {

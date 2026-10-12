@@ -93,6 +93,11 @@ export class EntityConfig {
     return this.spec.targetClassUris.map($rdf.namedNode)
   }
 
+  // CSVW Table Group loading
+  public get hasPagedContent(): boolean {
+    return this.spec.targetClassUris.includes('http://www.w3.org/ns/csvw#TableGroup')
+  }
+
   // VIEW --
 
   public get viewActions() {
