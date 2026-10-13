@@ -98,6 +98,8 @@
     }
 
     .csvw-table__sort-icon {
+      position: relative;
+      top: -.15em;
       font-size: .75em;
       margin-left: $space-xs;
     }

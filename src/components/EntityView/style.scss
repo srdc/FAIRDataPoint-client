@@ -5,10 +5,22 @@
   background: $color-light;
   padding: $space-md;
   border-radius: $space-md;
+
+  > .entity-metadata > .entity-metadata__group:first-child {
+    padding-top: 0;
+  }
+
+  > .entity-metadata > .entity-metadata__group:last-child {
+    padding-bottom: 0;
+  }
 }
 
 .csvw-content {
-  margin-top: $space-lg;
+  margin: $space-lg -15px 0;
+  border: 1px solid $color-separator;
+  background: $color-light;
+  padding: $space-md;
+  border-radius: $space-md;
 
   > nav {
     margin-top: $space-md;
