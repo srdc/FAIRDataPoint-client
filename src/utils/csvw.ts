@@ -42,50 +42,12 @@ export type VariableTable = {
   rows: VariableRow[],
 }
 
-function isDigit(code: number): boolean {
-  return code >= 48 && code <= 57
-}
-
-function stripZeros(number: string): string {
-  return number.replace(/^0+(?=.)/, '')
-}
-
-export function naturalCompare(first: string, second: string): number {
-  const left = first.toLowerCase()
-  const right = second.toLowerCase()
-  let posLeft = 0
-  let posRight = 0
-  while (posLeft < left.length && posRight < right.length) {
-    if (isDigit(left.charCodeAt(posLeft)) && isDigit(right.charCodeAt(posRight))) {
-      const startLeft = posLeft
-      const startRight = posRight
-      while (posLeft < left.length && isDigit(left.charCodeAt(posLeft))) posLeft += 1
-      while (posRight < right.length && isDigit(right.charCodeAt(posRight))) posRight += 1
-      const numberLeft = stripZeros(left.substring(startLeft, posLeft))
-      const numberRight = stripZeros(right.substring(startRight, posRight))
-      let result = Math.sign(numberLeft.length - numberRight.length)
-      if (result === 0 && numberLeft !== numberRight) {
-        result = numberLeft < numberRight ? -1 : 1
-      }
-      if (result === 0) {
-        result = Math.sign((posLeft - startLeft) - (posRight - startRight))
-      }
-      if (result !== 0) return result
-    } else {
-      const codeLeft = left.charCodeAt(posLeft)
-      const codeRight = right.charCodeAt(posRight)
-      if (codeLeft !== codeRight) return codeLeft < codeRight ? -1 : 1
-      posLeft += 1
-      posRight += 1
-    }
-  }
-  return Math.sign((left.length - posLeft) - (right.length - posRight))
-}
+const NATURAL_ORDER = new Intl.Collator('en', { numeric: true, sensitivity: 'accent' })
 
 function smallest(values: string[]): string | null {
   return values.length === 0
     ? null
-    : values.reduce((min, value) => (naturalCompare(value, min) < 0 ? value : min))
+    : values.reduce((min, value) => (NATURAL_ORDER.compare(value, min) < 0 ? value : min))
 }
 
 function sortValue(row: VariableRow, key: SortKey): string | null {
@@ -99,10 +61,12 @@ export function compareRows(key: SortKey, order: SortOrder) {
     if (key1 === null || key2 === null) {
       if (key1 !== key2) return key1 === null ? 1 : -1
     } else {
-      const result = naturalCompare(key1, key2)
+      const result = NATURAL_ORDER.compare(key1, key2)
       if (result !== 0) return order === 'desc' ? -result : result
     }
-    const byName = naturalCompare(sortValue(row1, 'name') || '', sortValue(row2, 'name') || '')
+    const name1 = sortValue(row1, 'name') || ''
+    const name2 = sortValue(row2, 'name') || ''
+    const byName = NATURAL_ORDER.compare(name1, name2)
     if (byName !== 0) return byName
     if (row1.id === row2.id) return 0
     return row1.id < row2.id ? -1 : 1
