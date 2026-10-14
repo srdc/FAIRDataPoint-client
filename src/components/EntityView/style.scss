@@ -5,4 +5,43 @@
   background: $color-light;
   padding: $space-md;
   border-radius: $space-md;
+
+  > .entity-metadata > .entity-metadata__group:first-child {
+    padding-top: 0;
+  }
+
+  > .entity-metadata > .entity-metadata__group:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.csvw-content {
+  margin: $space-lg -15px 0;
+  border: 1px solid $color-separator;
+  background: $color-light;
+  padding: $space-md;
+  border-radius: $space-md;
+
+  > nav {
+    margin-top: $space-md;
+  }
+
+  .content-pager__info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-sm;
+  }
+
+  .content-pager__size {
+    display: flex;
+    align-items: center;
+    margin: 0;
+
+    select {
+      width: auto;
+      margin-left: $space-sm;
+    }
+  }
 }

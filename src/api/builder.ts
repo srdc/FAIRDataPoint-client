@@ -27,6 +27,15 @@ function build(entity) {
       })
     },
 
+    getContentPage(id, page, size, sort = 'name', order = 'asc') {
+      const query = `page=${page}&size=${size}&sort=${sort}&order=${order}`
+      return request.get(`/${entity}/${id}/content?${query}`, {
+        headers: {
+          Accept: 'text/turtle',
+        },
+      })
+    },
+
     post(data) {
       return request.post(`/${entity}`, data, {
         headers: {
