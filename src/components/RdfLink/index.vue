@@ -1,5 +1,13 @@
 <template>
+  <router-link
+    v-if="internalPath"
+    :to="internalPath"
+    class="link"
+  >
+    {{ resolvedLabel || label }}
+  </router-link>
   <a
+    v-else
     :href="uri"
     target="_blank"
     class="link"
@@ -12,6 +20,7 @@ import {
   Component, Prop, Vue, Watch,
 } from 'vue-property-decorator'
 import api from '../../api'
+import config from '../../config'
 
 @Component
 export default class RdfLink extends Vue {
@@ -25,6 +34,14 @@ export default class RdfLink extends Vue {
   readonly labelResolved: boolean
 
   resolvedLabel : string = null
+
+  get internalPath(): string | null {
+    if (!this.uri) return null
+    const base = config.persistentURL()
+    if (!base || !this.uri.startsWith(base)) return null
+    const path = this.uri.slice(base.length)
+    return /^\/[^/]+\/[^/]+$/.test(path) ? path : null
+  }
 
   async created(): Promise<void> {
     if (!this.labelResolved) {

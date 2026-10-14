@@ -14,8 +14,11 @@ fi
 # set correct FDP Host for proxy pass
 sed -i "s#\$FDP_HOST#"$FDP_HOST"#g" /etc/nginx/conf.d/default.conf
 
-# set correct extractor host for the /excel-extraction/ proxy pass
-# (defaults to the compose service name:port if not provided)
+# Point the /excel-extraction/ proxy at the extractor, if one is configured.
+if [ -n "$EXTRACTOR_HOST" ]; then
+  sed -i "s#set \$extractor_host \"[^\"]*\";#set \$extractor_host \"$EXTRACTOR_HOST\";#" /etc/nginx/conf.d/default.conf
+fi
+
 sed -i "s#\$EXTRACTOR_HOST#"${EXTRACTOR_HOST:-stage-fdp-extractor:4000}"#g" /etc/nginx/conf.d/default.conf
 
 # set correct Public Path

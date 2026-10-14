@@ -79,12 +79,14 @@
                 <option value="standard">
                   Standardized workbook (.xlsx)
                 </option>
-                <option value="kora">
-                  KORA raw dictionary (.xlsx)
-                </option>
-                <option value="nfbc">
-                  NFBC raw dictionary (.csv)
-                </option>
+                <template v-if="isDataDictionary">
+                  <option value="kora">
+                    KORA raw dictionary (.xlsx)
+                  </option>
+                  <option value="nfbc">
+                    NFBC raw dictionary (.csv)
+                  </option>
+                </template>
               </select>
             </div>
             <div class="form-group">
@@ -107,8 +109,11 @@
                   type="checkbox"
                   data-cy="full-pipeline"
                 >
-                Full pipeline run (publish this layer and all child layers, no preview)
+                Full pipeline run
               </label>
+              <p class="form-text text-muted">
+                Covers {{ pipelineLayerNames.join(', ') }} only.
+              </p>
             </div>
             <div
               v-if="!fullPipeline"
@@ -241,11 +246,19 @@ export default class EntityImport extends EntityBase {
     return this.excelMode === 'nfbc' ? '.csv' : '.xlsx'
   }
 
+  get isDataDictionary(): boolean {
+    return this.config.urlPrefix === 'csvw'
+  }
+
   async fetchData(): Promise<void> {
     try {
       this.status.setPending()
 
       this.skipPreview = this.config.urlPrefix === 'csvw'
+
+      if (!this.isDataDictionary) {
+        this.excelMode = 'standard'
+      }
 
       const [spec, meta] = await this.loadData()
 
@@ -396,6 +409,22 @@ export default class EntityImport extends EntityBase {
 
   get usesExistingCatalog(): boolean {
     return this.config.urlPrefix === 'dataset' && !this.parentConfig.isRepository
+  }
+
+  get pipelineLayerNames(): string[] {
+    const names: string[] = []
+    let current: EntityConfig = this.config
+
+    while (current) {
+      const layer = current
+      names.push(layer.entitySpec.name)
+      const child = layer.children.find((c) => !layer.inlineChildSpec(c.relationUri))
+      current = child
+        ? this.$store.getters['entities/config'](layer.getChildUrlPrefix(child))
+        : null
+    }
+
+    return names
   }
 
   async runExcel() {
