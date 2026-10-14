@@ -42,6 +42,7 @@
                 <template v-if="item.items">
                   <entity-metadata
                     :metadata="[{fields: item.items}]"
+                    :nested="true"
                   />
                 </template>
                 <rdf-link
@@ -72,6 +73,19 @@
               Show less
             </a>
           </template>
+          <ul v-else-if="nested">
+            <li>
+              <rdf-link
+                v-if="data.uri"
+                :uri="data.uri"
+                :label="data.value"
+                :label-resolved="data.labelResolved"
+              />
+              <template v-else>
+                {{ data.value }}
+              </template>
+            </li>
+          </ul>
           <template v-else>
             <rdf-link
               v-if="data.uri"
@@ -101,6 +115,9 @@ import RdfLink from '@/components/RdfLink/index.vue'
 export default class EntityMetadata extends Vue {
   @Prop({ type: Array, default: [] })
   readonly metadata: Array<any>
+
+  @Prop({ type: Boolean, default: false })
+  readonly nested: boolean
 
   viewAll = []
 

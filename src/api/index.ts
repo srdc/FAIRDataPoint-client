@@ -1,6 +1,7 @@
 import apiKeys from './apiKeys'
 import builder from './builder'
 import configs from './configs'
+import excelExtraction from './excelExtraction'
 import fdpIndex from './fdpIndex'
 import forms from './forms'
 import info from './info'
@@ -20,6 +21,7 @@ export default {
   apiKeys,
   builder,
   configs,
+  excelExtraction,
   fdpIndex,
   forms,
   info,

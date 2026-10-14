@@ -3,10 +3,20 @@
 # create config
 config=/usr/share/nginx/html/config.js
 
-echo -n "window.config={publicPath:'"$PUBLIC_PATH"'};" > ${config}
+# apiURL/persistentURL point at the FDP's canonical URL so the SPA talks to it directly
+# (browser + extractor + minted URIs share one base). Falls back to same-origin if unset.
+if [ -n "$CLIENT_API_URL" ]; then
+  echo -n "window.config={publicPath:'"$PUBLIC_PATH"',apiURL:'"$CLIENT_API_URL"',persistentURL:'"$CLIENT_API_URL"'};" > ${config}
+else
+  echo -n "window.config={publicPath:'"$PUBLIC_PATH"'};" > ${config}
+fi
 
 # set correct FDP Host for proxy pass
 sed -i "s#\$FDP_HOST#"$FDP_HOST"#g" /etc/nginx/conf.d/default.conf
+
+# set correct extractor host for the /excel-extraction/ proxy pass
+# (defaults to the compose service name:port if not provided)
+sed -i "s#\$EXTRACTOR_HOST#"${EXTRACTOR_HOST:-stage-fdp-extractor:4000}"#g" /etc/nginx/conf.d/default.conf
 
 # set correct Public Path
 sed -i "s#/app/#"$PUBLIC_PATH"/#g" /usr/share/nginx/html/js/*.js

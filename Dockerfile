@@ -10,7 +10,7 @@ RUN npm install
 
 # build-layer
 COPY . .
-#RUN npm run build
+RUN npm run build
 
 # update version info
 RUN apk add git

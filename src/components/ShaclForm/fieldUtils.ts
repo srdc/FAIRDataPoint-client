@@ -18,7 +18,7 @@ function isDatetime(field: FormField): boolean {
 }
 
 function isIRI(field: FormField): boolean {
-  return field.nodeKind === SHACL('IRI').value || !!field.class
+  return field.nodeKind === SHACL('IRI').value || field.nodeKind === SHACL('BlankNodeOrIRI').value || !!field.class
 }
 
 function isList(field: FormField): boolean {
