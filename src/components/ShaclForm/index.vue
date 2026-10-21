@@ -58,7 +58,8 @@ import PrismEditor from 'vue-prism-editor'
 import FormRenderer from '@/components/ShaclForm/FormRenderer.vue'
 import StatusFlash from '@/components/StatusFlash/index.vue'
 import Status from '@/utils/Status'
-import { FormShape, SHACLFormParser } from '@/components/ShaclForm/Parser/SHACLFormParser'
+import { FormField, FormShape, SHACLFormParser,} from '@/components/ShaclForm/Parser/SHACLFormParser'
+import { Group } from '@/components/ShaclForm/Parser/SHACLParser'
 import * as formData from '@/components/ShaclForm/formData'
 import { ValidationReport } from '@/components/ShaclForm/Parser/ValidationReport'
 
@@ -110,7 +111,7 @@ export default class ShaclForm extends Vue {
     try {
       const parser = new SHACLFormParser(this.shacl)
       this.form = parser.parse(this.targetClasses)
-      const groups = parser.parseAndGroup(this.targetClasses)
+      const groups = this.toFormGroups(parser.parseAndGroup(this.targetClasses))
 
       this.formDefinition = {
         targetClasses: this.targetClasses,
@@ -127,6 +128,23 @@ export default class ShaclForm extends Vue {
     } catch (error) {
       this.status.setError('The form configuration is not valid.')
     }
+  }
+
+  toFormGroups(groups: Group<FormField>[]): Group<FormField>[] {
+    const realGroups = groups.filter((group) => group.isReal && group.fields.length > 0)
+    const looseFields = groups
+      .filter((group) => !group.isReal)
+      .flatMap((group) => group.fields)
+
+    if (looseFields.length === 0 && realGroups.length > 0) {
+      return realGroups
+    }
+
+    const label = realGroups.length > 0 ? 'Other' : null
+    const looseGroup = new Group<FormField>(null, label, null, null, false)
+    looseGroup.fields = looseFields
+
+    return [...realGroups, looseGroup]
   }
 
   onInput() {
