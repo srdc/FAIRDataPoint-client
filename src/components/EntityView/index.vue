@@ -114,17 +114,17 @@
             <div class="mt-4">
               <a
                 class="btn btn-outline-primary btn-rounded mr-2"
-                :href="`${subject}?format=ttl`"
+                :href="`${downloadUrl}?format=ttl`"
                 target="_blank"
               ><fa :icon="['fas', 'download']" /> ttl</a>
               <a
                 class="btn btn-outline-primary btn-rounded mr-2"
-                :href="`${subject}?format=rdf`"
+                :href="`${downloadUrl}?format=rdf`"
                 target="_blank"
               ><fa :icon="['fas', 'download']" /> rdf+xml</a>
               <a
                 class="btn btn-outline-primary btn-rounded mr-2"
-                :href="`${subject}?format=jsonld`"
+                :href="`${downloadUrl}?format=jsonld`"
                 target="_blank"
               ><fa :icon="['fas', 'download']" /> json-ld</a>
             </div>
@@ -321,6 +321,11 @@ export default class EntityView extends EntityBase {
 
   get isRepository() {
     return this.config.isRepository
+  }
+
+  get downloadUrl(): string {
+    const prefix = this.config.urlPrefix
+    return prefix ? `${config.apiURL}/${prefix}/${this.entityId}` : `${config.apiURL}/`
   }
 
   get isIndex() {
