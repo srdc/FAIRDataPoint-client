@@ -20,9 +20,20 @@ function parseResult(result, graph) {
   return {}
 }
 
-export function parseValidationReport(rdf: string) {
-  const graph = new Graph(rdf, DEFAULT_URI)
-  return graph
-    .findAll(SHACL('result'), { subject: null, value: false })
-    .reduce((acc, result) => _.merge(acc, parseResult(result, graph)), {})
+export function isValidationReport(data: unknown): data is string {
+  return typeof data === 'string' && data.includes('ValidationReport')
+}
+
+export function parseValidationReport(rdf: unknown): ValidationReport {
+  if (!isValidationReport(rdf)) {
+    return {}
+  }
+  try {
+    const graph = new Graph(rdf, DEFAULT_URI)
+    return graph
+      .findAll(SHACL('result'), { subject: null, value: false })
+      .reduce((acc, result) => _.merge(acc, parseResult(result, graph)), {})
+  } catch {
+    return {}
+  }
 }

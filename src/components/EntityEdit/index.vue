@@ -63,7 +63,11 @@ import Page from '@/components/Page/index.vue'
 import StatusFlash from '@/components/StatusFlash/index.vue'
 import Graph from '@/rdf/Graph'
 import permissions from '@/utils/permissions'
-import { parseValidationReport, ValidationReport } from '@/components/ShaclForm/Parser/ValidationReport'
+import {
+  isValidationReport,
+  parseValidationReport,
+  ValidationReport,
+} from '@/components/ShaclForm/Parser/ValidationReport'
 import EntityBase from '@/components/EntityBase'
 import Status from '@/utils/Status'
 import _ from 'lodash'
@@ -121,9 +125,14 @@ export default class EntityEdit extends EntityBase {
       await this.config.api.put(this.entityId, turtle)
       await this.$router.push(this.config.toUrl(this.entityId))
     } catch (error) {
-      this.rawError = _.get(error, 'response.data', null)
+      const data = _.get(error, 'response.data', null)
+      this.rawError = isValidationReport(data) ? data : null
       this.validationReport = parseValidationReport(this.rawError)
-      this.submitStatus.setError('Unable to update entity data.')
+      if (this.rawError) {
+        this.submitStatus.setError('Unable to update entity data.')
+      } else {
+        this.submitStatus.setErrorFromResponse(error, 'Unable to update entity data.')
+      }
       window.scrollTo(0, 0)
     }
   }

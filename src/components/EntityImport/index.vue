@@ -179,6 +179,7 @@ import { DCT, DCAT, RDF } from '@/rdf/namespaces'
 import config from '@/config'
 import api from '@/api'
 import {
+  isValidationReport,
   parseValidationReport,
   ValidationReport,
 } from '@/components/ShaclForm/Parser/ValidationReport'
@@ -294,11 +295,16 @@ export default class EntityImport extends EntityBase {
       const entityId = _.last(_.get(response, 'headers.location', '').split('/'))
       await this.$router.push(this.config.toUrl(entityId))
     } catch (error) {
-      this.rawError = _.get(error, 'response.data', null)
+      const data = _.get(error, 'response.data', null)
+      this.rawError = isValidationReport(data) ? data : null
       const validationReport = parseValidationReport(this.rawError)
       const focusNodeReport = _.first(Object.values(validationReport)) || {}
       this.validationReport = { [this.subject]: focusNodeReport }
-      this.submitStatus.setError('Unable to save entity data.')
+      if (this.rawError) {
+        this.submitStatus.setError('Unable to save entity data.')
+      } else {
+        this.submitStatus.setErrorFromResponse(error, 'Unable to save entity data.')
+      }
       window.scrollTo(0, 0)
     }
   }
@@ -377,11 +383,16 @@ export default class EntityImport extends EntityBase {
       const entityId = _.last(_.get(response, 'headers.location', '').split('/'))
       await this.$router.push(this.config.toUrl(entityId))
     } catch (error) {
-      this.rawError = _.get(error, 'response.data', null)
+      const data = _.get(error, 'response.data', null)
+      this.rawError = isValidationReport(data) ? data : null
       const validationReport = parseValidationReport(this.rawError)
       const focusNodeReport = _.first(Object.values(validationReport)) || {}
       this.validationReport = { [this.subject]: focusNodeReport }
-      this.submitStatus.setError('Unable to save entity data.')
+      if (this.rawError) {
+        this.submitStatus.setError('Unable to save entity data.')
+      } else {
+        this.submitStatus.setErrorFromResponse(error, 'Unable to save entity data.')
+      }
       window.scrollTo(0, 0)
     }
   }

@@ -58,8 +58,17 @@ export default class Status {
 
   setErrorFromResponse(error: any, defaultMsg: string): void {
     this.status = Status.ERROR
-    this.msg = _.get(error, 'response.data.message', defaultMsg)
+    this.msg = _.get(error, 'response.data.message')
+      || Status.plainTextMessage(_.get(error, 'response.data'))
+      || defaultMsg
     this.errorCode = _.get(error, 'response.status')
+  }
+
+  private static plainTextMessage(data: unknown): string | null {
+    if (typeof data !== 'string') return null
+    const text = data.trim()
+    if (text === '' || text.length > 300 || /\n/.test(text) || /^[<@{[]/.test(text)) return null
+    return text
   }
 
   setDone(msg?: string): void {
