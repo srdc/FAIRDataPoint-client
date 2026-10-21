@@ -92,7 +92,8 @@ function createQuads(
       return values.flatMap((value) => {
         if (isFormData(value)) {
           const nestedQuads = createQuads(value, originalRdf, findField(key)?.nodeShape)
-          if (nestedQuads.length > 0) {
+          const hasContent = nestedQuads.some((quad) => !quad.predicate.equals(RDF('type')))
+          if (hasContent) {
             return [
               $rdf.quad(data.subject, $rdf.namedNode(key), _.get(value, 'subject'), null),
               ...nestedQuads,
