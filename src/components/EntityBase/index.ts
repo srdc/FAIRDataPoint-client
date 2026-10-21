@@ -6,6 +6,7 @@ import { EntityConfig } from '@/entity/EntityConfig'
 import { BreadcrumbItem } from '@/utils/breadcrumbs'
 import Graph from '@/rdf/Graph'
 import { DCT } from '@/rdf/namespaces'
+import rdfUtils from '@/rdf/utils'
 
 @Component({})
 export default class EntityBase extends Vue {
@@ -69,7 +70,7 @@ export default class EntityBase extends Vue {
 
   createEntityData() {
     this.entity = {
-      title: this.graph.findOne(DCT('title')) as string,
+      title: rdfUtils.titleOrFallback(this.graph.findOne(DCT('title')), this.subject),
       description: this.graph.findOne(DCT('description')) as string,
     }
   }

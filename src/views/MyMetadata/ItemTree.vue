@@ -20,7 +20,7 @@
         class="item-list__item__control"
       />
       <avatar
-        :initials="item.title[0]"
+        :initials="plainTitle(item)[0]"
         :value="item.uri"
         smaller
       />
@@ -45,6 +45,7 @@ import _ from 'lodash'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import Avatar from '../../components/Avatar/index.vue'
 import MembershipBadge from '../../components/MembershipBadge/index.vue'
+import rdfUtils from '../../rdf/utils'
 
 type Item = {
   children: Item[]
@@ -63,8 +64,12 @@ export default class ItemTree extends Vue {
   @Prop({ required: true })
   readonly value: Item[]
 
+  plainTitle(item) {
+    return rdfUtils.titleOrFallback(item.title, item.uri)
+  }
+
   title(item) {
-    return item.state === 'DRAFT' ? `[DRAFT] ${item.title}` : item.title
+    return item.state === 'DRAFT' ? `[DRAFT] ${this.plainTitle(item)}` : this.plainTitle(item)
   }
 
   sortByTitle(list) {

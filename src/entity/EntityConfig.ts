@@ -208,7 +208,7 @@ export class EntityConfig {
         const prefix = stateChildren[c.subject.value] === 'DRAFT' ? '[DRAFT] ' : ''
 
         return {
-          title: prefix + graph.findOne(DCT('title'), options),
+          title: prefix + rdfUtils.titleOrFallback(graph.findOne(DCT('title'), options), c.subject.value),
           link: `/${this.getChildUrlPrefix(child)}/${id}`,
           description: graph.findOne(DCT('description'), options),
           tags,
@@ -238,7 +238,7 @@ export class EntityConfig {
 
     const id = rdfUtils.pathTerm(iri)
     const url = this.createUrl(spec.urlPrefix, id)
-    const item = breadcrumbs.createItem(pathItem.title, url)
+    const item = breadcrumbs.createItem(rdfUtils.titleOrFallback(pathItem.title, iri), url)
 
     return this.buildBreadcrumbs(path, pathItem.parent).concat([item])
   }
