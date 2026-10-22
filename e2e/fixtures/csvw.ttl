@@ -1,0 +1,16 @@
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+
+# Small CSVW Table Group (data dictionary) with three variables.
+# The import page relinks dct:isPartOf to the dataset it is imported into.
+<{{SUBJECT}}> a csvw:TableGroup ;
+    dct:title "{{TITLE}}"@en ;
+    csvw:table [
+        a csvw:Table ;
+        dct:title "{{TITLE}} table"@en ;
+        csvw:column
+            [ a csvw:Column ; csvw:name "age" ; csvw:titles "Age" ; dct:description "Age at visit in years" ; csvw:datatype "integer" ] ,
+            [ a csvw:Column ; csvw:name "bmi" ; csvw:titles "Body mass index" ; dct:description "BMI in kg/m2" ; csvw:datatype "decimal" ] ,
+            [ a csvw:Column ; csvw:name "smoker" ; csvw:titles "Smoking status" ; dct:description "Current smoker (yes/no)" ; csvw:datatype "boolean" ]
+    ] ;
+    dct:isPartOf <{{PARENT}}> .

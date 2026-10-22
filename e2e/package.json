@@ -1,0 +1,18 @@
+{
+  "name": "fdp-client-e2e-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright UI simulation tests for the STAGE FAIR Data Point client",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --project=smoke",
+    "test:flow": "playwright test --project=flow",
+    "test:admin": "playwright test --project=admin",
+    "test:excel": "playwright test --project=excel",
+    "report": "playwright show-report reports/html",
+    "install-browser": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0"
+  }
+}

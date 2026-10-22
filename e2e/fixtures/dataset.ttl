@@ -1,0 +1,27 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix cv:   <http://data.europa.eu/m8g/> .
+@prefix healthdcatap: <http://healthdataportal.eu/ns/health#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Minimal PUBLIC Dataset that satisfies the FDP Dataset + Resource shapes (HealthDCAT-AP R7).
+# The import page replaces dct:isPartOf with the catalog it is imported into.
+<{{SUBJECT}}> a dcat:Dataset ;
+    dct:title "{{TITLE}}"@en ;
+    dct:description "{{DESCRIPTION}}"@en ;
+    dct:identifier "{{IDENTIFIER}}" ;
+    dcat:theme <http://publications.europa.eu/resource/authority/data-theme/HEAL> ;
+    dct:accessRights <http://publications.europa.eu/resource/authority/access-right/PUBLIC> ;
+    <http://data.europa.eu/r5r/applicableLegislation> <http://data.europa.eu/eli/reg/2025/327/oj> ;
+    healthdcatap:healthCategory <https://hdeu-dcat.acceptance.data.health.europa.eu/resource/authority/healthcategories/RQSH> ;
+    healthdcatap:hasStructuredData "true"^^xsd:boolean ;
+    healthdcatap:hdab [
+        a foaf:Agent ;
+        foaf:name "STAGE E2E test HDAB" ;
+        cv:contactPoint [ a cv:ContactPoint ; cv:email "hdab@example.org" ]
+    ] ;
+    dct:isPartOf <{{PARENT}}> .
+
+<http://data.europa.eu/eli/reg/2025/327/oj> a <http://data.europa.eu/eli/ontology#LegalResource> .
+<http://publications.europa.eu/resource/authority/access-right/PUBLIC> a dct:RightsStatement .
